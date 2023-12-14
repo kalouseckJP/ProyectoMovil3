@@ -1,15 +1,12 @@
 import 'package:clinica_app3/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 class SecondPage extends StatefulWidget {
   const SecondPage(
       {super.key, required this.emailText, required this.passwordText});
   final String emailText;
   final String passwordText;
-
   @override
   State<SecondPage> createState() => _SecondPage();
 }
@@ -269,11 +266,17 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                       width: double.infinity,
                                       height: double.infinity,
                                       child: StreamBuilder(
-                                        stream:
-                                            db.collection('citas').snapshots(),
+                                        stream: db
+                                            .collection('citas')
+                                            .orderBy('id').where('prof_rut',isEqualTo: widget.emailText)
+                                            .snapshots(),
                                         builder: (context, snapshot) {
                                           // If the connection is done and there is no error, display the data
                                           var tasks = snapshot.data!.docs;
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return CircularProgressIndicator();
+                                          }
                                           return ListView.builder(
                                             scrollDirection: Axis.vertical,
                                             padding: const EdgeInsets.all(0),
@@ -281,8 +284,12 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                             itemBuilder: (context, index) {
                                               var task = tasks[index];
                                               return ListTile(
-                                                contentPadding: const EdgeInsets.all(0),
-                                                visualDensity: const VisualDensity(horizontal: 0,vertical: 0),
+                                                contentPadding:
+                                                    const EdgeInsets.all(0),
+                                                visualDensity:
+                                                    const VisualDensity(
+                                                        horizontal: 0,
+                                                        vertical: 0),
                                                 minLeadingWidth: 0,
                                                 minVerticalPadding: 0,
                                                 subtitle: Column(
@@ -430,7 +437,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                           ),
                                                         ),
                                                       ),
-                                                      if (index % 2 != 0)
+                                                    if (index % 2 != 0)
                                                       Container(
                                                         height: 50,
                                                         decoration:

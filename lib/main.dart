@@ -159,7 +159,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialStatePropertyAll(Color.fromRGBO(75, 75, 75, 1)),
                 ),
                 onPressed: () async {
-                   if ((await verificarCredenciales(emailController, passwordController)) == true) {
+
+                  if ((await verificarCredenciales(
+                          emailController, passwordController)) ==
+                      true) {
+                    // ignore: use_build_context_synchronously
                     Navigator.push(
                       context,
                       MaterialPageRoute(
