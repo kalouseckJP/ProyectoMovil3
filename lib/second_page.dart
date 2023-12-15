@@ -13,6 +13,8 @@ class SecondPage extends StatefulWidget {
 
 class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
   late final TabController _tabController;
+  TextEditingController _fechaController = TextEditingController();
+  TextEditingController _horaController = TextEditingController();
 
   final db = FirebaseFirestore.instance;
 
@@ -26,6 +28,36 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> _seleccionarFecha() async {
+    DateTime? _picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2025, 12, 31),
+    );
+    if (_picked != null) {
+      setState(
+        () {
+          _fechaController.text = _picked.toString().split(" ")[0];
+        },
+      );
+    }
+  }
+
+  Future<void> _seleccionarHora() async {
+    TimeOfDay? _picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (_picked != null) {
+      setState(
+        () {
+          _horaController.text =
+              '${_picked.hour.toString().padLeft(2, '0')}:${_picked.minute.toString().padLeft(2, '0')}';
+        },
+      );
+    }
   }
 
   @override
@@ -268,21 +300,29 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                       child: StreamBuilder(
                                         stream: db
                                             .collection('citas')
-                                            .orderBy('id').where('prof_rut',isEqualTo: widget.emailText)
+                                            .orderBy('id')
+                                            .where('prof_rut',
+                                                isEqualTo: widget.emailText)
                                             .snapshots(),
                                         builder: (context, snapshot) {
                                           // If the connection is done and there is no error, display the data
-                                          var tasks = snapshot.data!.docs;
+                                          var tasks = snapshot.data?.docs;
                                           if (snapshot.connectionState ==
                                               ConnectionState.waiting) {
-                                            return CircularProgressIndicator();
+                                            return const Center(
+                                              child: SizedBox(
+                                                  width: 50,
+                                                  height: 50,
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                            );
                                           }
                                           return ListView.builder(
                                             scrollDirection: Axis.vertical,
                                             padding: const EdgeInsets.all(0),
-                                            itemCount: tasks.length,
+                                            itemCount: tasks?.length,
                                             itemBuilder: (context, index) {
-                                              var task = tasks[index];
+                                              var task = tasks?[index];
                                               return ListTile(
                                                 contentPadding:
                                                     const EdgeInsets.all(0),
@@ -344,7 +384,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                       Alignment
                                                                           .center,
                                                                   child: Text(
-                                                                    '${task['id']}',
+                                                                    '${task?['id']}',
                                                                   ),
                                                                 ),
                                                               ),
@@ -367,7 +407,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         Alignment
                                                                             .center,
                                                                     child: Text(
-                                                                        '${task['fecha']}'),
+                                                                        '${task?['fecha']}'),
                                                                   ),
                                                                 ),
                                                               ),
@@ -390,7 +430,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         Alignment
                                                                             .center,
                                                                     child: Text(
-                                                                        '${task['hora']}'),
+                                                                        '${task?['hora']}'),
                                                                   ),
                                                                 ),
                                                               ),
@@ -413,7 +453,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         Alignment
                                                                             .center,
                                                                     child: Text(
-                                                                        '${task['sala']}'),
+                                                                        '${task?['sala']}'),
                                                                   ),
                                                                 ),
                                                               ),
@@ -426,7 +466,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                           .center,
                                                                   child:
                                                                       Checkbox(
-                                                                    value: task[
+                                                                    value: task?[
                                                                         'ocupado'],
                                                                     onChanged:
                                                                         null,
@@ -484,7 +524,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                       Alignment
                                                                           .center,
                                                                   child: Text(
-                                                                    '${task['id']}',
+                                                                    '${task?['id']}',
                                                                   ),
                                                                 ),
                                                               ),
@@ -507,7 +547,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         Alignment
                                                                             .center,
                                                                     child: Text(
-                                                                        '${task['fecha']}'),
+                                                                        '${task?['fecha']}'),
                                                                   ),
                                                                 ),
                                                               ),
@@ -530,7 +570,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         Alignment
                                                                             .center,
                                                                     child: Text(
-                                                                        '${task['hora']}'),
+                                                                        '${task?['hora']}'),
                                                                   ),
                                                                 ),
                                                               ),
@@ -553,7 +593,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         Alignment
                                                                             .center,
                                                                     child: Text(
-                                                                        '${task['sala']}'),
+                                                                        '${task?['sala']}'),
                                                                   ),
                                                                 ),
                                                               ),
@@ -566,7 +606,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                           .center,
                                                                   child:
                                                                       Checkbox(
-                                                                    value: task[
+                                                                    value: task?[
                                                                         'ocupado'],
                                                                     onChanged:
                                                                         null,
@@ -581,13 +621,257 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                 ),
                                               );
                                             },
-                                            // You can display additional information or perform actions here
                                           );
                                         },
                                       ),
                                     ),
                                   ),
                                 ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 70,
+                            margin: const EdgeInsets.only(bottom: 10),
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    const Color.fromRGBO(110, 140, 220, 1)),
+                              ),
+                              onPressed: () {
+                                DateTime dateSelected;
+                                Timestamp timeSelected;
+                                String dropDownValue = '1';
+
+                                var _items = [
+                                  '1',
+                                  '2',
+                                  '3',
+                                  '4',
+                                  '5',
+                                  '6',
+                                  '7',
+                                  '8'
+                                ];
+
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                      builder: (BuildContext context,
+                                          StateSetter setState) {
+                                        return Dialog(
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20, vertical: 30),
+                                            child: ListView(
+                                              shrinkWrap: true,
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  width: double.infinity,
+                                                  child: Text(
+                                                    'Agregar Datos',
+                                                    textAlign: TextAlign.center,
+                                                    style:
+                                                        TextStyle(fontSize: 24),
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 50,
+                                                  width: double.infinity,
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.bottomLeft,
+                                                    child: Text(
+                                                      'Fecha:',
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextField(
+                                                  controller: _fechaController,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    width: 1)),
+                                                    labelText: 'Fecha',
+                                                    suffixIcon: Icon(
+                                                        Icons.calendar_today),
+                                                    floatingLabelBehavior:
+                                                        FloatingLabelBehavior
+                                                            .never,
+                                                    focusedBorder:
+                                                        OutlineInputBorder(
+                                                            borderSide: BorderSide(
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        110,
+                                                                        140,
+                                                                        220,
+                                                                        1))),
+                                                  ),
+                                                  readOnly: true,
+                                                  onTap: () {
+                                                    _seleccionarFecha();
+                                                  },
+                                                ),
+                                                const SizedBox(
+                                                  height: 70,
+                                                  width: double.infinity,
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.bottomLeft,
+                                                    child: Text(
+                                                      'Hora',
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextField(
+                                                  controller: _horaController,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    width: 1)),
+                                                    labelText: 'Hora',
+                                                    suffixIcon:
+                                                        Icon(Icons.access_time),
+                                                    floatingLabelBehavior:
+                                                        FloatingLabelBehavior
+                                                            .never,
+                                                    focusedBorder:
+                                                        OutlineInputBorder(
+                                                            borderSide: BorderSide(
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        110,
+                                                                        140,
+                                                                        220,
+                                                                        1))),
+                                                  ),
+                                                  readOnly: true,
+                                                  onTap: () {
+                                                    _seleccionarHora();
+                                                  },
+                                                ),
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      top: 40),
+                                                  child: Row(
+                                                    children: [
+                                                      const SizedBox(
+                                                        child: Text(
+                                                          'Sala',
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        child: Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                              width: 1,
+                                                            ),
+                                                            borderRadius:
+                                                                const BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            4)),
+                                                          ),
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 20),
+                                                          child: Align(
+                                                            alignment: Alignment
+                                                                .centerRight,
+                                                            child:
+                                                                DropdownButton(
+                                                              underline:
+                                                                  const SizedBox(),
+                                                              items: _items
+                                                                  .map((String
+                                                                          item) =>
+                                                                      DropdownMenuItem(
+                                                                          value:
+                                                                              item,
+                                                                          child:
+                                                                              Text(item)))
+                                                                  .toList(),
+                                                              onChanged: (String?
+                                                                  newValue) {
+                                                                setState(
+                                                                  () {
+                                                                    dropDownValue =
+                                                                        newValue!;
+                                                                  },
+                                                                );
+                                                              },
+                                                              value:
+                                                                  dropDownValue,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 50,
+                                                  margin: const EdgeInsets.only(
+                                                      top: 20),
+                                                  child: ElevatedButton(
+                                                    style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all(const Color
+                                                                  .fromRGBO(110,
+                                                                  140, 220, 1)),
+                                                    ),
+                                                    onPressed: () {
+                                                      print('tst');
+                                                    },
+                                                    child: const Text(
+                                                      'Continuar',
+                                                      style: TextStyle(
+                                                        fontSize: 24,
+                                                        color: Color.fromRGBO(
+                                                            242, 248, 241, 1),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: const Text(
+                                  'Agendar',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Color.fromRGBO(242, 248, 241, 1),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
