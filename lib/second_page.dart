@@ -13,8 +13,8 @@ class SecondPage extends StatefulWidget {
 
 class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
   late final TabController _tabController;
-  TextEditingController _fechaController = TextEditingController();
-  TextEditingController _horaController = TextEditingController();
+  final TextEditingController _fechaController = TextEditingController();
+  final TextEditingController _horaController = TextEditingController();
 
   final db = FirebaseFirestore.instance;
 
@@ -30,7 +30,7 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<void> _seleccionarFecha() async {
+  Future<String> _seleccionarFecha() async {
     DateTime? _picked = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
@@ -42,10 +42,13 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
           _fechaController.text = _picked.toString().split(" ")[0];
         },
       );
+      print(_fechaController.text);
+      return _fechaController.text;
     }
+    return _fechaController.text;
   }
 
-  Future<void> _seleccionarHora() async {
+  Future<String> _seleccionarHora() async {
     TimeOfDay? _picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -57,7 +60,10 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
               '${_picked.hour.toString().padLeft(2, '0')}:${_picked.minute.toString().padLeft(2, '0')}';
         },
       );
+      print(_horaController.text);
+      return _horaController.text;
     }
+    return _horaController.text;
   }
 
   @override
@@ -639,8 +645,8 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                     const Color.fromRGBO(110, 140, 220, 1)),
                               ),
                               onPressed: () {
-                                DateTime dateSelected;
-                                Timestamp timeSelected;
+                                Future<String?> dateSelected;
+                                Future<String?> timeSelected;
                                 String dropDownValue = '1';
 
                                 var _items = [
@@ -717,7 +723,8 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                   ),
                                                   readOnly: true,
                                                   onTap: () {
-                                                    _seleccionarFecha();
+                                                    dateSelected =
+                                                        _seleccionarFecha();
                                                   },
                                                 ),
                                                 const SizedBox(
@@ -761,7 +768,8 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                   ),
                                                   readOnly: true,
                                                   onTap: () {
-                                                    _seleccionarHora();
+                                                    timeSelected =
+                                                        _seleccionarHora();
                                                   },
                                                 ),
                                                 Container(
@@ -840,8 +848,79 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                   .fromRGBO(110,
                                                                   140, 220, 1)),
                                                     ),
-                                                    onPressed: () {
-                                                      print('tst');
+                                                    onPressed: () async {
+                                                      var nextId;
+                                                      var snapshot = await db
+                                                          .collection('citas')
+                                                          .get()
+                                                          .then(
+                                                              (querySnapshot) =>
+                                                                  querySnapshot
+                                                                      .docs
+                                                                      .length);
+                                                      var fecha,
+                                                          id,
+                                                          hora,
+                                                          prof_rut,
+                                                          ocupado,
+                                                          prof_email,
+                                                          sala;
+
+                                                      if (_fechaController
+                                                                  .text ==
+                                                              '' ||
+                                                          _horaController
+                                                                  .text ==
+                                                              '') {
+                                                        if (_fechaController
+                                                                .text ==
+                                                            '') {
+                                                          print('fecha vacio');
+                                                        }
+                                                        if (_horaController
+                                                                .text ==
+                                                            '') {
+                                                          print('hora vacio');
+                                                        }
+                                                      } else {
+                                                        db
+                                                            .collection('citas')
+                                                            .where('prof_rut',
+                                                                isEqualTo: widget
+                                                                    .emailText);
+                                                        print(_fechaController
+                                                            .text
+                                                            .split('-')
+                                                            .reversed
+                                                            .toString()
+                                                            .replaceAll(
+                                                                RegExp(r'\('),
+                                                                '')
+                                                            .replaceAll(
+                                                                RegExp(r'\)'),
+                                                                '')
+                                                            .replaceAll(
+                                                                RegExp(r', '),
+                                                                '/'));
+                                                        print(_horaController
+                                                            .text);
+                                                        print('id: ${snapshot}');
+                                                        var citaData = {
+                                                          id: snapshot.toInt(),
+                                                          fecha:
+                                                              "your_fecha_value",
+                                                          hora:
+                                                              "your_hora_value",
+                                                          ocupado:
+                                                              false, // or true based on your requirement
+                                                          prof_rut:
+                                                              "prof_rut_value",
+                                                          prof_email:
+                                                              "prof_email_value",
+                                                          sala: "sala_value"
+                                                        };
+                                                      }
+                                                      print(dropDownValue);
                                                     },
                                                     child: const Text(
                                                       'Continuar',
