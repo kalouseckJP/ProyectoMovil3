@@ -40,6 +40,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool datosErroneos = false;
 
   final db = FirebaseFirestore.instance;
 
@@ -54,11 +55,14 @@ class _MyHomePageState extends State<MyHomePage> {
       (querySnapshot) {
         if (querySnapshot.docs.isEmpty) {
           print('Datos Incorrectos');
+          datosErroneos;
+          false;
           correcto = false;
           return false;
         } else {
           print(
               'Datos correctos Email: ${querySnapshot.docs[0].get('email')} Contraseña: ${querySnapshot.docs[0].get('clave')}');
+          datosErroneos = true;
           correcto = true;
           return true;
         }
@@ -146,6 +150,18 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                   ),
+                  if (datosErroneos)
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: const Text(
+                        'Datos erroneos',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -159,10 +175,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialStatePropertyAll(Color.fromRGBO(75, 75, 75, 1)),
                 ),
                 onPressed: () async {
-
                   if ((await verificarCredenciales(
                           emailController, passwordController)) ==
                       true) {
+                    datosErroneos = false;
                     // ignore: use_build_context_synchronously
                     Navigator.push(
                       context,
@@ -172,6 +188,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           passwordText: passwordController.text,
                         ),
                       ),
+                    );
+                  } else {
+                    setState(
+                      () {
+                        datosErroneos = true;
+                      },
                     );
                   }
                 },
