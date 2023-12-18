@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
@@ -46,25 +47,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<bool> verificarCredenciales(emailIngresado, passwordIngresada) async {
     bool correcto = false;
-    await db
-        .collection("profesional")
-        .where("email", isEqualTo: "${emailIngresado.text}")
-        .where("clave", isEqualTo: "${passwordIngresada.text}")
-        .get()
-        .then(
+    await db.collection("profesional").where("email", isEqualTo: "${emailIngresado.text}").where("clave", isEqualTo: "${passwordIngresada.text}").get().then(
       (querySnapshot) {
         if (querySnapshot.docs.isEmpty) {
-          print('Datos Incorrectos');
-          datosErroneos;
-          false;
+          datosErroneos = false;
           correcto = false;
-          return false;
+          return correcto;
         } else {
-          print(
-              'Datos correctos Email: ${querySnapshot.docs[0].get('email')} Contraseña: ${querySnapshot.docs[0].get('clave')}');
           datosErroneos = true;
           correcto = true;
-          return true;
+          return correcto;
         }
       },
     );
@@ -78,13 +70,10 @@ class _MyHomePageState extends State<MyHomePage> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: const BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-              Color.fromRGBO(189, 228, 250, 1),
-              Color.fromRGBO(38, 88, 217, 1),
-            ])),
+            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+          Color.fromRGBO(189, 228, 250, 1),
+          Color.fromRGBO(38, 88, 217, 1),
+        ])),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -155,10 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       width: MediaQuery.of(context).size.width,
                       child: const Text(
                         'Datos erroneos',
-                        style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.start,
                       ),
                     ),
@@ -171,13 +157,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               child: ElevatedButton(
                 style: const ButtonStyle(
-                  backgroundColor:
-                      MaterialStatePropertyAll(Color.fromRGBO(75, 75, 75, 1)),
+                  backgroundColor: MaterialStatePropertyAll(Color.fromRGBO(75, 75, 75, 1)),
                 ),
                 onPressed: () async {
-                  if ((await verificarCredenciales(
-                          emailController, passwordController)) ==
-                      true) {
+                  if ((await verificarCredenciales(emailController, passwordController)) == true) {
                     datosErroneos = false;
                     // ignore: use_build_context_synchronously
                     Navigator.push(
