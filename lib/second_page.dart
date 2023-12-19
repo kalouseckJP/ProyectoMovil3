@@ -2275,8 +2275,8 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         future: _getCurrenProfesionalEspecialidad(task?['prof_email']),
                                                                         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                                                                           if (!snapshot.hasData) return Container();
-                                                                          final String? nmomrbe = snapshot.data;
-                                                                          return Text(nmomrbe as String);
+                                                                          final String? nombre = snapshot.data;
+                                                                          return Text(nombre as String);
                                                                         },
                                                                       ),
                                                                     ),
@@ -2357,8 +2357,8 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         future: _getCurrenProfesionalNombre(task?['prof_email']),
                                                                         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                                                                           if (!snapshot.hasData) return Container();
-                                                                          final String? nmomrbe = snapshot.data;
-                                                                          return Text(nmomrbe as String, softWrap: true);
+                                                                          final String? nombre = snapshot.data;
+                                                                          return Text(nombre as String, softWrap: true);
                                                                         },
                                                                       ),
                                                                     ),
@@ -2379,8 +2379,8 @@ class _SecondPage extends State<SecondPage> with TickerProviderStateMixin {
                                                                         future: _getCurrenProfesionalEspecialidad(task?['prof_email']),
                                                                         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                                                                           if (!snapshot.hasData) return Container();
-                                                                          final String? nmomrbe = snapshot.data;
-                                                                          return Text(nmomrbe as String);
+                                                                          final String? nombre = snapshot.data;
+                                                                          return Text(nombre as String);
                                                                         },
                                                                       ),
                                                                     ),
